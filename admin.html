@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Élite - Panel de Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen flex">
+
+    <!-- LOGIN RESTRENGIDO DEL ADMIN -->
+    <div id="admin-login-guard" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-amber-500/20 max-w-md w-full rounded-2xl p-8 space-y-4 shadow-2xl text-center">
+            <h2 class="text-2xl font-serif text-amber-400">Autenticación de Canales</h2>
+            <p class="text-xs text-slate-400">Se requiere inicio de sesión administrativo para acceder</p>
+            <input type="text" id="adm-user" placeholder="Escribe tu Rol (admin / editor / moderador)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:border-amber-500 outline-none">
+            <input type="password" id="adm-pass" placeholder="Contraseña Maestra" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:border-amber-500 outline-none">
+            <button onclick="unlockAdminDashboard()" class="w-full bg-amber-500 text-slate-950 font-bold py-3 rounded-xl hover:bg-amber-600 transition-all">Validar Credenciales</button>
+            <p id="adm-fail-msg" class="text-rose-400 text-xs hidden">Combinación o rol inválido.</p>
+        </div>
+    </div>
+
+    <!-- MAIN PANEL WRAPPER -->
+    <div id="admin-main-view" class="w-full min-h-screen flex hidden">
+        <!-- SIDEBAR -->
+        <aside class="w-64 border-r border-amber-500/10 bg-slate-900/50 p-6 flex flex-col justify-between hidden md:flex">
+            <div>
+                <div class="text-xl font-serif tracking-widest text-amber-500 mb-2">L'ÉLITE ADMIN</div>
+                <div class="text-[10px] uppercase font-mono tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-1 rounded inline-block mb-10">Rol: <span id="display-role">Ninguno</span></div>
+                <nav class="space-y-4 text-sm">
+                    <a href="#stats" class="block py-2 text-amber-400 font-semibold">📈 Métricas</a>
+                    <a href="#products" class="block py-2 hover:text-amber-400 transition-colors">📦 Inventario</a>
+                    <a href="#staff" class="block py-2 hover:text-amber-400 transition-colors">👥 Personal y Claves</a>
+                </nav>
+            </div>
+            <button onclick="logoutAdmin()" class="text-left text-xs text-rose-400 hover:underline">Cerrar Sesión</button>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="flex-1 p-6 md:p-10 overflow-y-auto space-y-12">
+            <!-- SECCIÓN METRICAS -->
+            <section id="stats" class="space-y-6">
+                <h1 class="text-2xl font-serif text-amber-400">Análisis y Rendimiento</h1>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+                        <span class="text-xs text-slate-400 uppercase">Ventas Brutas</span>
+                        <h3 class="text-3xl font-serif text-amber-400 mt-2">$24'850,000</h3>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+                        <span class="text-xs text-slate-400 uppercase">Órdenes Completadas</span>
+                        <h3 class="text-3xl font-serif text-emerald-400 mt-2">142</h3>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+                        <span class="text-xs text-slate-400 uppercase">Tasa de Conversión</span>
+                        <h3 class="text-3xl font-serif text-blue-400 mt-2">4.8%</h3>
+                    </div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-3xl">
+                    <h4 class="text-sm font-semibold mb-4">Comportamiento Mensual de Ventas</h4>
+                    <canvas id="salesChart" class="w-full max-h-64"></canvas>
+                </div>
+            </section>
+
+            <!-- SECCIÓN GESTIÓN PRODUCTO MULTIMEDIA LOCAL -->
+            <section id="products" class="grid grid-cols-1 lg:grid-cols-2 gap-8 border-t border-slate-800 pt-10">
+                <div>
+                    <h2 class="text-xl font-serif text-amber-400 mb-6">Agregar Nueva Pieza</h2>
+                    <form id="form-product" class="space-y-4">
+                        <input type="text" id="prod-name" placeholder="Nombre del Producto" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm" required>
+                        <input type="number" id="prod-price" placeholder="Precio (COP)" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm" required>
+                        <textarea id="prod-desc" placeholder="Descripción de Lujo" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm h-24" required></textarea>
+                        
+                        <!-- File Picker para Imagen / Video Local -->
+                        <div class="space-y-2">
+                            <label class="block text-xs text-amber-400 font-semibold uppercase tracking-wider">Multimedia del Dispositivo (Imágenes o Videos)</label>
+                            <input type="file" id="prod-media-local" accept="image/*,video/*" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-400" onchange="previewMediaAsset(event)" required>
+                            <div id="media-local-preview" class="grid grid-cols-3 gap-2 pt-2"></div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl transition-all duration-300">Registrar en Inventario</button>
+                    </form>
+                </div>
+
+                <!-- SECCIÓN EMPLEADOS / CAMBIO DE CLAVE -->
+                <div id="staff" class="space-y-6">
+                    <div id="admin-staff-management">
+                        <h2 class="text-xl font-serif text-amber-400 mb-6">Contratación y Roles</h2>
+                        <form id="form-staff" class="space-y-4 mb-6">
+                            <input type="email" id="staff-email" placeholder="Correo Electrónico del Empleado" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm" required>
+                            <input type="password" id="staff-pass" placeholder="Contraseña Temporal" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm" required>
+                            <select id="staff-role" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-400">
+                                <option value="editor">Editor de Contenido</option>
+                                <option value="moderador">Moderador de Pedidos</option>
+                                <option value="admin">Administrador General</option>
+                            </select>
+                            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold py-3 rounded-xl transition-all">Crear Cuenta de Personal</button>
+                        </form>
+                    </div>
+
+                    <!-- MODULO: CAMBIAR MI CONTRASEÑA -->
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+                        <h3 class="text-sm font-semibold uppercase text-amber-400 mb-2 tracking-wider">Seguridad de Acceso</h3>
+                        <p class="text-xs text-slate-400 mb-4">Actualiza la contraseña maestra de autenticación del panel.</p>
+                        <input type="password" id="new-master-pass" placeholder="Nueva Contraseña Maestra" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm mb-3 focus:border-amber-500 outline-none">
+                        <button onclick="updateMasterPassword()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold px-4 py-2 rounded-xl transition-all">Cambiar Mi Contraseña</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script type="module" src="js/admin.js"></script>
+
+</body>
+</html>

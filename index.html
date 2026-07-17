@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Élite - Boutique Exclusiva</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght=0,400..900;1,400..900&family=Montserrat:wght=300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen flex flex-col justify-between">
+    <!-- NAV BAR -->
+    <nav class="border-b border-amber-500/10 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+        <a href="#" class="brand text-2xl font-serif tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-500">L'ÉLITE</a>
+        <div class="flex items-center gap-6">
+            <button id="btn-cart" class="relative hover:text-amber-400 transition-colors">
+                🛒 <span id="cart-count" class="absolute -top-2 -right-2 bg-amber-500 text-slate-950 text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+            </button>
+            <button id="btn-auth-modal" class="border border-amber-500/30 px-4 py-1.5 rounded-full text-xs hover:bg-amber-500 hover:text-slate-950 transition-all duration-300">
+                INGRESAR
+            </button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="py-20 text-center px-4 max-w-4xl mx-auto">
+        <span class="text-xs tracking-[0.3em] text-amber-500/70 font-semibold uppercase">Colección Permanente</span>
+        <h1 class="text-5xl md:text-6xl font-serif mt-3 mb-6 tracking-tight leading-tight">La sutileza del lujo en cada detalle.</h1>
+        <p class="text-slate-400 max-w-xl mx-auto text-sm leading-relaxed">Catálogo curado de piezas exclusivas. Pagos rápidos y seguros acordados directamente a través de nuestra línea privada de WhatsApp o Pasarelas Online.</p>
+    </header>
+
+    <!-- PRODUCTOS -->
+    <main class="max-w-7xl mx-auto px-6 mb-20 w-full">
+        <h2 class="text-lg tracking-widest mb-8 border-b border-amber-500/10 pb-4 text-amber-500/80 font-serif">NUESTRAS PIEZAS</h2>
+        <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    </main>
+
+    <!-- MODAL COMPRAR / DETALLES (Convertido a Pantalla Completa Elegante) -->
+    <div id="modal-product" class="fixed inset-0 bg-slate-950 z-50 overflow-y-auto hidden flex-col p-6 md:p-12">
+        <button onclick="closeProductModal()" class="self-start text-amber-400 hover:text-amber-300 mb-6 font-semibold flex items-center gap-2 text-sm">
+            ← Regresar al catálogo
+        </button>
+        <div id="modal-content" class="max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-10"></div>
+    </div>
+
+    <!-- MODAL REGISTRO / LOGIN + HISTORIAL COMPRAS -->
+    <div id="modal-auth" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-amber-500/20 max-w-md w-full rounded-2xl p-8 relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-amber-400">✕</button>
+            
+            <div id="auth-interactive-container">
+                <h2 id="auth-title" class="text-2xl font-serif text-amber-400 mb-6 text-center">Iniciar Sesión</h2>
+                <form id="auth-form" class="space-y-4">
+                    <input type="email" id="auth-email" placeholder="Correo Electrónico" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500/50 outline-none rounded-xl px-4 py-3 text-sm transition-colors" required>
+                    <input type="password" id="auth-password" placeholder="Contraseña" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500/50 outline-none rounded-xl px-4 py-3 text-sm transition-colors" required>
+                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl transition-all duration-300">Aceptar</button>
+                </form>
+                <p class="text-xs text-center text-slate-400 mt-4">
+                    <span id="auth-toggle-text">¿No tienes cuenta?</span> 
+                    <button id="auth-toggle" class="text-amber-400 underline font-semibold ml-1">Regístrate</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CARRITO SIDEBAR -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full max-w-md bg-slate-900 border-l border-amber-500/10 p-6 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between">
+        <div>
+            <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-6">
+                <h3 class="font-serif text-lg text-amber-400">Tu Orden</h3>
+                <button onclick="toggleCart()" class="text-slate-400 hover:text-amber-400">✕ Cerrar</button>
+            </div>
+            <div id="cart-items" class="space-y-4 overflow-y-auto max-h-[60vh]"></div>
+        </div>
+        <div class="border-t border-slate-800 pt-6">
+            <div class="flex justify-between text-sm mb-4">
+                <span>Subtotal Estimado:</span>
+                <span id="cart-total" class="font-bold text-amber-400">$0 COP</span>
+            </div>
+            <button onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 mb-3">
+                💬 Completar por WhatsApp
+            </button>
+            <button onclick="iniciarPagoMercadoPago()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2.5 rounded-xl transition-all">
+                💳 Pagar Online con MercadoPago
+            </button>
+        </div>
+    </div>
+
+    <footer class="border-t border-amber-500/5 py-8 text-center text-xs text-slate-500">
+        <p>&copy; 2026 L'Élite. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Tus scripts al final de index.html -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/store.js"></script>
+
+    <script type="module" src="js/auth.js"></script> <!-- Cambiado a type="module" -->
+    <script src="js/mercadopago.js"></script>
+</body>
+
+
+</html>
